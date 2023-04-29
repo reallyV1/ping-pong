@@ -22,6 +22,20 @@ class Plaer1 (GameSprite):
             self.rect.y -= self.speed
         if keys[K_s] and self.rect.y<400:
             self.rect.y += self.speed
+class Boll (GameSprite):
+    def __init__(self,image_file,plaer_x,plaer_y,width,height,plaer_speed):
+        super().__init__(image_file,plaer_x,plaer_y,width,height,plaer_speed)
+        self.speed_x = self.speed
+        self.speed_y = self.speed
+    def update(self):
+        self.rect.x += self.speed_x
+        self.rect.y += self.speed_y
+        if (self.rect.y <= 0) or (self.rect.y >= 490):
+            self.speed_y *= -1
+
+        
+
+
 class Plaer2 (GameSprite):
     def update(self):
         keys = key.get_pressed()
@@ -34,14 +48,15 @@ beckground_color = (0,0,255)
 beckground = Surface((700,500))
 beckground.fill(beckground_color)
 window = display.set_mode((700,500))
-player1 = Plaer1('rocket.png',100,400,25,100,10)
-player2 = Plaer2('rocket.png',500,400,25,100,10)
+player1 = Plaer1('rocket.png',10,400,25,100,10)
+player2 = Plaer2('rocket.png',680,400,25,100,10)
+boll = Boll('rocket.png',100,100,15,15,3)
 game = True 
 finish = False
 font.init()
 font2 = font.SysFont('Arial', 30)
-win=font2.render('Ты выйграл', True, (0, 255, 0))
-lose=font2.render('Ты проиграл', True, (255, 0, 0))
+player1_win=font2.render('player 1 выйграл', True, (0, 255, 0))
+player2_win=font2.render('player 2 выйграл', True, (255, 0, 0))
 while game == True:
     for e in event.get():
         if e.type == QUIT:
@@ -52,6 +67,16 @@ while game == True:
         player1.update()
         player2.reset()
         player2.update()
+        boll.reset()
+        boll.update()
+        if (sprite.collide_rect(boll,player1)) or (sprite.collide_rect(boll, player2)):
+            boll.speed_x *= -1
+        if boll.rect.x <= 0:
+            finish = True 
+            window.blit(player2_win,(300,300))
+        if boll.rect.x >= 700:
+            finish = True 
+            window.blit(player1_win,(300,300))
         display.update()
         clock.tick(FPS)
         
